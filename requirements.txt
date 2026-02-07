@@ -1,0 +1,35 @@
+# =====================================================================
+# SIMULADOR DE PORTAFOLIO DE INVERSIONES
+# Dependencias del Backend (Versiones flexibles para Py3.13)
+# =====================================================================
+
+# Framework Web
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Base de Datos
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Utilidades
+python-dateutil
+pydantic
+pydantic-settings
+passlib[bcrypt]
+python-jose[cryptography]
+bcrypt
+python-dotenv
+
+# Cálculos financieros y matemáticos
+numpy
+scipy
+
+# Manejo de fechas financieras
+pandas
+
+# Testing (opcional)
+pytest
+pytest-asyncio
+httpx
