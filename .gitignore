@@ -31,6 +31,7 @@ logs/
 *.swo
 *~
 .DS_Store
+Thumbs.db
 
 # Ignorar archivos de prueba
 .pytest_cache/
@@ -42,14 +43,12 @@ htmlcov/
 temp/
 tmp/
 
-# Ignorar node_modules si hay frontend
+# Ignorar node_modules y builds del frontend
 node_modules/
 dist/
+dist-ssr/
 build/
 
 # Ignorar archivos de configuración local
 config.local.py
 *.local
-
-# Ignorar archivos de sistema
-Thumbs.db

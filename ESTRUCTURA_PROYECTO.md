@@ -1,13 +1,14 @@
 # Estructura del Proyecto - Simulador Financiero
 
 ## Resumen Ejecutivo
+
 Simulador de Portafolio de Inversiones Web completo con sistema de lotes, cálculos financieros avanzados y gestión de caja de ahorros.
 
 ---
 
 ## Árbol de Directorios
 
-```
+```text
 SimuladorFinanciero/
 │
 ├── README.md                     # Documentación principal del proyecto
@@ -19,6 +20,8 @@ SimuladorFinanciero/
 ├── .gitignore                   # Archivos ignorados por Git
 ├── install.bat                  # Script instalación Windows
 ├── install.sh                   # Script instalación Linux/Mac
+├── start.bat                    # Script inicio Windows
+├── start.ps1                    # Script inicio PowerShell
 │
 ├── database/                    # Scripts SQL
 │   └── schema.sql               # Esquema completo PostgreSQL
@@ -43,56 +46,43 @@ SimuladorFinanciero/
 │   │   │   ├── transaccion.py   # Modelo Transaccion
 │   │   │   ├── parametro.py     # Modelo ParametroSistema
 │   │   │   ├── calculo_bono.py  # Modelo CalculoBono
-│   │   │   ├── valoracion.py    # Modelo ValoracionDiaria
+│   │   │   └── valoracion.py    # Modelo ValoracionDiaria
 │   │   │
 │   │   ├── services/            # Lógica de negocio
 │   │   │   ├── __init__.py
 │   │   │   ├── lote_service.py        # Servicio de Lotes
-│   │   │   │                              # - comprar_activo()
-│   │   │   │                              # - vender_activo() con FIFO
-│   │   │   │                              # - obtener_resumen_por_activo()
-│   │   │   │                              # - obtener_estadisticas_lotes()
-│   │   │   │
 │   │   │   └── calculo_service.py     # Servicio de Cálculos
-│   │   │                                  # - calcular_precio_bono_sucio()
-│   │   │                                  # - calcular_liquidacion_cdt()
-│   │   │                                  # - convertir_divisa()
-│   │   │                                  # - calcular_calificacion_final()
 │   │   │
 │   │   ├── schemas/             # Esquemas Pydantic
 │   │   │   ├── __init__.py
 │   │   │   ├── lote_schemas.py        # Schemas de Lotes
-│   │   │   │                              # - LoteCompraRequest
-│   │   │   │                              # - LoteVentaRequest
-│   │   │   │                              # - LoteResponse
-│   │   │   │                              # - EstadisticasLotesResponse
-│   │   │   │
 │   │   │   └── calculo_schemas.py     # Schemas de Cálculos
-│   │   │                                  # - CalculoBonoRequest/Response
-│   │   │                                  # - CalculoCDTRequest/Response
-│   │   │                                  # - ConversionDivisaRequest/Response
-│   │   │                                  # - CalificacionRequest/Response
 │   │   │
 │   │   └── api/                 # Endpoints REST
 │   │       ├── __init__.py
 │   │       ├── lotes.py               # Endpoints de Lotes
-│   │       │                              # POST /api/lotes/comprar
-│   │       │                              # POST /api/lotes/vender
-│   │       │                              # GET  /api/lotes/usuario/{id}
-│   │       │                              # GET  /api/lotes/usuario/{id}/resumen
-│   │       │                              # GET  /api/lotes/usuario/{id}/estadisticas
-│   │       │
 │   │       └── calculos.py            # Endpoints de Cálculos
-│   │                                      # POST /api/calculos/bono/precio-sucio
-│   │                                      # POST /api/calculos/bono/desde-activo
-│   │                                      # POST /api/calculos/cdt/liquidar
-│   │                                      # POST /api/calculos/divisa/convertir
-│   │                                      # POST /api/calculos/calificacion
 │   │
 │   └── tests/                   # Tests unitarios
 │       ├── __init__.py
 │       ├── conftest.py          # Configuración pytest
 │       └── test_services.py     # Tests de servicios
+│
+├── frontend/                    # Frontend React + TypeScript
+│   ├── src/
+│   │   ├── components/          # Componentes reutilizables
+│   │   │   ├── ui/              # FormCard, InputField, etc.
+│   │   │   └── layout/          # Sidebar, MainLayout
+│   │   ├── pages/               # Páginas de la aplicación
+│   │   │   ├── Dashboard/
+│   │   │   ├── Lotes/
+│   │   │   ├── Transacciones/
+│   │   │   ├── Calculadoras/
+│   │   │   └── Calificacion/
+│   │   ├── services/            # Servicios API (Axios)
+│   │   └── types/               # Tipos TypeScript
+│   ├── vite.config.ts           # Configuración Vite + Tailwind
+│   └── package.json             # Dependencias frontend
 │
 └── venv/                        # Entorno virtual Python
 ```
@@ -101,7 +91,8 @@ SimuladorFinanciero/
 
 ## Archivos Clave
 
-### Base de Datos
+### Base de Datos (PostgreSQL)
+
 - **`database/schema.sql`**: Esquema completo con:
   - 11 tablas principales
   - 2 triggers automáticos (estado_lote, validar_saldo_caja)
@@ -109,14 +100,16 @@ SimuladorFinanciero/
   - Índices optimizados
   - Constraints de integridad referencial
 
-### Backend API
+### Aplicación Backend
+
 - **`backend/app/main.py`**: Aplicación FastAPI con:
   - Configuración CORS
   - Documentación automática en `/docs`
   - Inclusión de routers (lotes, calculos)
 
 ### Lógica de Negocio
-- **`backend/app/services/lote_service.py`**: 
+
+- **`backend/app/services/lote_service.py`**:
   - Gestión completa de lotes
   - Sistema de semáforo (VERDE/AMARILLO/ROJO)
   - Lógica FIFO para ventas
@@ -129,10 +122,12 @@ SimuladorFinanciero/
   - Cálculo de calificaciones
 
 ### API REST
+
 - **`backend/app/api/lotes.py`**: 5 endpoints de lotes
 - **`backend/app/api/calculos.py`**: 5 endpoints de cálculos financieros
 
 ### Modelos de Datos
+
 - **`backend/app/models/lote.py`**: Modelo Lote con:
   - Enum EstadoLote (VERDE/AMARILLO/ROJO)
   - Método `calcular_estado()`
@@ -140,6 +135,7 @@ SimuladorFinanciero/
   - Property `porcentaje_disponible`
 
 ### Esquemas de Validación
+
 - **`backend/app/schemas/lote_schemas.py`**: Validación de requests/responses de lotes
 - **`backend/app/schemas/calculo_schemas.py`**: Validación de cálculos financieros
 
@@ -148,18 +144,29 @@ SimuladorFinanciero/
 ## Tecnologías Utilizadas
 
 ### Backend
+
 - **FastAPI 0.109.0**: Framework web moderno
 - **SQLAlchemy 2.0.25**: ORM para PostgreSQL
 - **Pydantic 2.5.3**: Validación de datos
 - **psycopg2-binary 2.9.9**: Driver PostgreSQL
 - **Python Decimal**: Precisión financiera
 
-### Base de Datos
-- **PostgreSQL 14+**: Base de datos relacional
+### Frontend
+
+- **React 19**: Biblioteca de UI
+- **TypeScript**: Tipado estático
+- **Vite 7**: Build tool y dev server
+- **Tailwind CSS v4**: Estilos utilitarios
+- **Recharts**: Gráficos interactivos
+- **Axios**: Cliente HTTP
+
+### Base de Datos PostgreSQL
+
 - **NUMERIC(18,2)**: Tipo para valores monetarios
 - **NUMERIC(18,6)**: Tipo para cantidades de activos
 
 ### Herramientas
+
 - **pytest**: Testing
 - **uvicorn**: Servidor ASGI
 
@@ -168,6 +175,7 @@ SimuladorFinanciero/
 ## Características Implementadas
 
 ### Sistema de Lotes
+
 - [x] Gestión de inventario por lotes
 - [x] Estados de semáforo (Verde/Amarillo/Rojo)
 - [x] Lógica FIFO para ventas
@@ -175,23 +183,35 @@ SimuladorFinanciero/
 - [x] Trazabilidad completa
 
 ### Cálculos Financieros
+
 - [x] Valoración de bonos (precio sucio)
 - [x] Liquidación de CDTs con penalizaciones
 - [x] Conversión de divisas
 - [x] Cálculo de calificaciones
 
 ### Gestión de Caja
+
 - [x] Validación de saldo disponible
 - [x] Depósitos y retiros
 - [x] Saldo en tiempo real
 
-### API REST
+### Endpoints REST
+
 - [x] 10+ endpoints funcionales
 - [x] Documentación automática (Swagger)
 - [x] Validación de entrada/salida
 - [x] Manejo de errores
 
+### Frontend Web
+
+- [x] Dashboard con estadísticas en tiempo real
+- [x] Tabla de lotes con filtros por semáforo
+- [x] Formularios de compra y venta
+- [x] Calculadoras financieras (Bonos, CDTs, Divisas)
+- [x] Calificación del portafolio
+
 ### Documentación
+
 - [x] README completo
 - [x] Guía de instalación
 - [x] Validación de fórmulas matemáticas
@@ -202,27 +222,30 @@ SimuladorFinanciero/
 
 ## Estadísticas del Proyecto
 
-- **Archivos de código**: 25+
+- **Archivos de código**: 40+
 - **Líneas de código Python**: ~2,500+
+- **Líneas de código TypeScript**: ~2,000+
 - **Líneas de código SQL**: ~600+
 - **Endpoints API**: 10
+- **Páginas Frontend**: 8
 - **Modelos de datos**: 8
 - **Servicios de negocio**: 2
-- **Tests**: Estructura completa
-- **Documentación**: 4 archivos MD
+- **Documentación**: 5 archivos MD
 
 ---
 
 ## Próximos Pasos
 
-### Frontend (Pendiente)
-- [ ] Aplicación React con Tailwind CSS
-- [ ] Componentes de visualización de lotes
-- [ ] Dashboard de portafolio
-- [ ] Formularios de transacciones
-- [ ] Gráficos de rendimiento
+### Mejoras Frontend
+
+- [ ] Gráficos de rendimiento avanzados
+- [ ] Exportación a PDF/Excel
+- [ ] Sistema de alertas (vencimientos)
+- [ ] Modo oscuro
+- [ ] Diseño responsive mejorado
 
 ### Mejoras Backend
+
 - [ ] Autenticación JWT
 - [ ] Rate limiting
 - [ ] Logging avanzado
@@ -230,6 +253,7 @@ SimuladorFinanciero/
 - [ ] Containerización con Docker
 
 ### DevOps
+
 - [ ] CI/CD con GitHub Actions
 - [ ] Despliegue en cloud
 - [ ] Monitoreo con Prometheus
@@ -237,11 +261,11 @@ SimuladorFinanciero/
 
 ---
 
-## Información de Contacto
+## Información del Proyecto
 
-**Proyecto**: Simulador de Portafolio de Inversiones  
-**Stack**: Python + FastAPI + PostgreSQL + React (Futuro)  
-**Estado**: Backend Completo  
+**Proyecto**: Simulador de Portafolio de Inversiones
+**Stack**: Python + FastAPI + PostgreSQL + React + TypeScript + Tailwind
+**Estado**: Backend y Frontend Completos
 **Versión**: 1.0.0
 
 ---
@@ -257,4 +281,4 @@ SimuladorFinanciero/
 
 ---
 
-**Última actualización**: Diciembre 2024
+Última actualización: Febrero 2026

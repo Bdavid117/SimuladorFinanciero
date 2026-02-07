@@ -1,16 +1,17 @@
-# =====================================================================
-# GUÍA DE INSTALACIÓN Y DESPLIEGUE
-# Simulador de Portafolio de Inversiones
-# =====================================================================
+# Guía de Instalación y Despliegue
+
+Simulador de Portafolio de Inversiones
 
 ## Requisitos Previos
 
 ### Software Necesario
+
 - **Python 3.9+**: [Descargar](https://www.python.org/downloads/)
 - **PostgreSQL 14+**: [Descargar](https://www.postgresql.org/download/)
 - **Git** (opcional): Para clonar el repositorio
 
 ### Conocimientos Recomendados
+
 - Básicos de Python
 - SQL y bases de datos relacionales
 - Conceptos de APIs REST
@@ -134,12 +135,15 @@ La aplicación estará disponible en `http://localhost:8000`
 ## Solución de Problemas Comunes
 
 ### Error: "psql not recognized"
+
 - Asegúrate de agregar la carpeta bin de PostgreSQL al PATH del sistema
 
 ### Error: "Connection refused"
+
 - Verifica que el servicio de PostgreSQL esté corriendo
 - Revisa las credenciales en `.env`
 
 ### Error: "Module not found"
+
 - Verifica que el entorno virtual esté activado (`(venv)` en la terminal)
 - Reinstala dependencias: `pip install -r requirements.txt`

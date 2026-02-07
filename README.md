@@ -4,7 +4,8 @@ Sistema web para gestión de portafolios de inversión con arquitectura de lotes
 
 ## Características Principales
 
-### 1. **Arquitectura de Lotes (Inventario)**
+### 1. Arquitectura de Lotes (Inventario)
+
 - Sistema de gestión por lotes FIFO
 - Estados visuales (Semáforo):
   - **Verde**: Lote completo disponible
@@ -12,28 +13,31 @@ Sistema web para gestión de portafolios de inversión con arquitectura de lotes
   - **Rojo**: Lote totalmente vendido
 - Trazabilidad completa de cada compra
 
-### 2. **Motor de Cálculos Financieros**
+### 2. Motor de Cálculos Financieros
+
 - **Valoración de Bonos** (Precio Sucio)
   - Cálculo de cupón acumulado
   - TIR personalizable
   - Soporte para bonos con cupones semestrales/trimestrales
-  
+
 - **Liquidación de CDTs**
   - Cálculo de intereses compuestos
   - Penalizaciones parametrizables:
     - 10% para liquidación ≤ 60 días
     - 20% para liquidación > 60 días
-  
+
 - **Conversión de Divisas**
   - Cálculo automático con TRM
   - Soporte para activos extranjeros
 
-### 3. **Sistema de Caja de Ahorros**
+### 3. Sistema de Caja de Ahorros
+
 - Control de efectivo disponible
 - Validación automática de saldo antes de compras
 - Registro de todas las transacciones
 
-### 4. **Sistema de Calificación**
+### 4. Sistema de Calificación
+
 - Calificación automática al liquidar portafolio
 - Fórmula: `Nota = (Rendimiento Real / Meta Admin) × 5.0`
 - Meta parametrizable por el administrador
@@ -41,52 +45,46 @@ Sistema web para gestión de portafolios de inversión con arquitectura de lotes
 ## Stack Tecnológico
 
 ### Backend
+
 - **FastAPI**: Framework web moderno y rápido
 - **SQLAlchemy**: ORM para PostgreSQL
 - **PostgreSQL**: Base de datos con precisión decimal
 - **Pydantic**: Validación de datos
 
-### Frontend (Recomendado)
-- **React**: Librería UI
+### Frontend
+
+- **React**: Librería UI con TypeScript
+- **Vite**: Bundler ultrarrápido
 - **Tailwind CSS**: Estilos y sistema de colores
-- **TypeScript**: Tipado estático
+- **Recharts**: Gráficos interactivos
 
 ## Estructura del Proyecto
 
-```
+```text
 SimuladorFinanciero/
 ├── database/
-│   └── schema.sql              # Esquema completo de la BD
+│   └── schema.sql
 ├── backend/
 │   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py            # Punto de entrada FastAPI
-│   │   ├── config.py          # Configuración
-│   │   ├── models/            # Modelos SQLAlchemy
-│   │   │   ├── __init__.py
-│   │   │   ├── usuario.py
-│   │   │   ├── lote.py
-│   │   │   ├── activo.py
-│   │   │   ├── transaccion.py
-│   │   │   └── caja.py
-│   │   ├── schemas/           # Schemas Pydantic
-│   │   │   ├── __init__.py
-│   │   │   ├── lote.py
-│   │   │   ├── transaccion.py
-│   │   │   └── activo.py
-│   │   ├── services/          # Lógica de negocio
-│   │   │   ├── __init__.py
-│   │   │   ├── lote_service.py
-│   │   │   ├── calculo_service.py
-│   │   │   └── transaccion_service.py
-│   │   ├── api/               # Endpoints
-│   │   │   ├── __init__.py
-│   │   │   ├── lotes.py
-│   │   │   ├── transacciones.py
-│   │   │   └── activos.py
-│   │   └── database.py        # Conexión DB
-│   └── tests/                 # Tests unitarios
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── api/
+│   └── tests/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── types/
+│   ├── package.json
+│   └── vite.config.ts
 ├── requirements.txt
+├── start.bat
+├── start.ps1
 ├── .env.example
 └── README.md
 ```
@@ -107,8 +105,13 @@ venv\Scripts\activate
 # Linux/Mac:
 source venv/bin/activate
 
-# Instalar dependencias
+# Instalar dependencias del backend
 pip install -r requirements.txt
+
+# Instalar dependencias del frontend
+cd frontend
+npm install
+cd ..
 ```
 
 ### 2. Configurar Base de Datos
@@ -129,88 +132,67 @@ psql -U postgres -d simulador_inversiones -f database/schema.sql
 # Copiar archivo de ejemplo
 cp .env.example .env
 
-# Editar .env con tus credenciales
+# Editar .env con tus credenciales de PostgreSQL
 ```
 
 ### 4. Ejecutar la aplicación
 
 ```bash
-cd backend
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Opción 1: Script automático (Windows)
+start.bat
+# o en PowerShell:
+.\start.ps1
+
+# Opción 2: Manual
+# Terminal 1 - Backend:
+set PYTHONPATH=backend
+python -m uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 - Frontend:
+cd frontend
+npm run dev
 ```
 
-La API estará disponible en: `http://localhost:8000`
-Documentación interactiva: `http://localhost:8000/docs`
-
-## Esquema de Base de Datos
-
-### Tablas Principales
-
-1. **lotes**: Sistema de inventario por lotes
-2. **transacciones**: Registro histórico de operaciones
-3. **activos**: Catálogo de instrumentos financieros
-4. **caja_ahorros**: Control de efectivo por usuario
-5. **parametros_sistema**: Configuración del sistema
-
-### Características Especiales
-
-- **Triggers automáticos** para actualizar estados de lotes
-- **Validación de saldo** antes de compras
-- **Precisión decimal** (`NUMERIC`) para cálculos financieros
-- **Índices optimizados** para consultas rápidas
-- **Vistas materializadas** para reportes
+- Backend: `http://localhost:8000`
+- Frontend: `http://localhost:5173`
+- API Docs: `http://localhost:8000/docs`
 
 ## Fórmulas Financieras Implementadas
 
 ### Valoración de Bonos (Precio Sucio)
 
-$$Precio = \sum_{t=1}^{n} \frac{Cupón}{(1+TIR)^t} + \frac{Nominal}{(1+TIR)^n} + Cupón \ Acumulado$$
+$$Precio = \sum_{t=1}^{n} \frac{Cupón}{(1+TIR)^t} + \frac{Nominal}{(1+TIR)^n} + Cupón\ Acumulado$$
 
 ### CDTs con Interés Compuesto
 
 $$I = P \times \left((1 + i)^{\frac{n}{365}} - 1\right)$$
 
 Con penalización:
+
 - 10% si $n \leq 60$ días
 - 20% si $n > 60$ días
 
 ### Conversión de Divisas
 
-$$Costo \ Total = (Cantidad \times Precio \times TRM) + Comisión$$
+$$Costo\ Total = (Cantidad \times Precio \times TRM) + Comisión$$
 
 ## API Endpoints
 
 ### Lotes
-- `POST /api/lotes/comprar` - Crear nuevo lote (compra)
-- `POST /api/lotes/vender` - Vender desde lotes disponibles
-- `GET /api/lotes/usuario/{id}` - Obtener lotes por usuario
-- `GET /api/lotes/{id}/estado` - Consultar estado de un lote
 
-### Transacciones
-- `GET /api/transacciones/usuario/{id}` - Histórico de transacciones
-- `POST /api/transacciones/deposito` - Depositar efectivo
-- `POST /api/transacciones/retiro` - Retirar efectivo
+- `POST /api/lotes/comprar` — Crear nuevo lote (compra)
+- `POST /api/lotes/vender` — Vender desde lotes disponibles (FIFO)
+- `GET /api/lotes/usuario/{id_usuario}` — Obtener lotes por usuario
+- `GET /api/lotes/usuario/{id_usuario}/resumen` — Resumen por activo
+- `GET /api/lotes/usuario/{id_usuario}/estadisticas` — Dashboard estadísticas
 
 ### Cálculos Financieros
-- `POST /api/calculos/bono/precio-sucio` - Calcular precio de bono
-- `POST /api/calculos/cdt/liquidar` - Liquidar CDT con penalización
-- `POST /api/calculos/divisa/convertir` - Convertir divisa
 
-### Portafolio
-- `GET /api/portafolio/resumen/{id_usuario}` - Resumen del portafolio
-- `GET /api/portafolio/valoracion/{id_usuario}` - Valoración actual
-- `POST /api/portafolio/liquidar` - Liquidar todo a efectivo y calificar
-
-## Sistema de Colores (Frontend)
-
-```javascript
-// Tailwind CSS classes para estados de lotes
-const estadoColors = {
-  VERDE: 'bg-green-500 text-white',    // Lote completo
-  AMARILLO: 'bg-yellow-500 text-black', // Lote parcial
-  ROJO: 'bg-red-500 text-white'        // Lote agotado
-};
-```
+- `POST /api/calculos/bono/precio-sucio` — Calcular precio de bono
+- `POST /api/calculos/bono/desde-activo` — Calcular bono desde activo
+- `POST /api/calculos/cdt/liquidar` — Liquidar CDT con penalización
+- `POST /api/calculos/divisa/convertir` — Convertir divisa
+- `POST /api/calculos/calificacion` — Calificar portafolio
 
 ## Testing
 
@@ -226,65 +208,33 @@ pytest --cov=app backend/tests/
 
 ### Comprar Activo
 
-```python
-# POST /api/lotes/comprar
+```json
 {
-  "id_usuario": "uuid-del-usuario",
-  "id_activo": "uuid-del-activo",
+  "id_usuario": "550e8400-e29b-41d4-a716-446655440000",
+  "id_activo": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "cantidad": 100,
   "precio_compra": 25000,
   "comision": 250,
-  "trm": 1.0,
-  "url_evidencia": "https://ejemplo.com/screenshot.png"
+  "trm": 1.0
 }
 ```
 
-### Vender Activo (automático desde lotes FIFO)
+### Vender Activo (FIFO)
 
-```python
-# POST /api/lotes/vender
+```json
 {
-  "id_usuario": "uuid-del-usuario",
-  "id_activo": "uuid-del-activo",
+  "id_usuario": "550e8400-e29b-41d4-a716-446655440000",
+  "id_activo": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "cantidad": 50,
   "precio_venta": 27000,
   "comision": 270
 }
 ```
 
-## Seguridad
-
-- Autenticación JWT
-- Hash de contraseñas con bcrypt
-- Validación de datos con Pydantic
-- CORS configurado
-- Variables de entorno para secretos
-
-## Próximas Características
-
-- [ ] Dashboard con gráficos de rendimiento
-- [ ] Exportación de reportes en PDF
-- [ ] Notificaciones de vencimiento de bonos/CDTs
-- [ ] API de precios en tiempo real
-- [ ] Soporte para más tipos de activos (opciones, futuros)
-
-## Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
 ## Licencia
 
 Este proyecto es privado y confidencial.
 
-## Contacto
-
-Para preguntas o soporte: demo@simulador.com
-
 ---
 
-**Desarrollado por el equipo de Ingeniería Financiera**
+Desarrollado por el equipo de Ingeniería Financiera
