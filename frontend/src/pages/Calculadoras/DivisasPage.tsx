@@ -79,9 +79,9 @@ export default function DivisasPage() {
       </FormCard>
 
       {result && (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-6">
-          <h3 className="text-sm font-semibold text-slate-800 mb-4">Resultado de Conversión</h3>
-          <div className="space-y-0 divide-y divide-slate-50">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 p-6">
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4">Resultado de Conversión</h3>
+          <div className="space-y-0 divide-y divide-slate-50 dark:divide-slate-700">
             <ResultRow label="Cantidad" value={fmt(result.cantidad)} />
             <ResultRow label="Precio Unitario (USD)" value={`USD ${fmt(result.precio_unitario_extranjero)}`} />
             <ResultRow label="Costo en Extranjero" value={`USD ${fmt(result.costo_extranjero)}`} />

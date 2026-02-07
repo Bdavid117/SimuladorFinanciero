@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 
 # Importar routers
-from app.api import lotes, calculos
+from app.api import lotes, calculos, auth
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -40,9 +40,14 @@ app = FastAPI(
 )
 
 # Configurar CORS
+# Parse ALLOWED_ORIGINS from comma-separated string or list
+origins = settings.ALLOWED_ORIGINS
+if isinstance(origins, str):
+    origins = [o.strip() for o in origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,5 +73,6 @@ async def health_check():
     }
 
 # Incluir routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Autenticación"])
 app.include_router(lotes.router, prefix="/api/lotes", tags=["Lotes - Sistema de Inventario"])
 app.include_router(calculos.router, prefix="/api/calculos", tags=["Cálculos Financieros"])

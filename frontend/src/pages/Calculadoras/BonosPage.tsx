@@ -89,9 +89,9 @@ export default function BonosPage() {
       </FormCard>
 
       {result && (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-6">
-          <h3 className="text-sm font-semibold text-slate-800 mb-4">Resultado de la Valoración</h3>
-          <div className="space-y-0 divide-y divide-slate-50">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 p-6">
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4">Resultado de la Valoración</h3>
+          <div className="space-y-0 divide-y divide-slate-50 dark:divide-slate-700">
             <ResultRow label="Precio Sucio" value={`$ ${fmt(result.precio_sucio)}`} highlight />
             <ResultRow label="Precio Limpio" value={`$ ${fmt(result.precio_limpio)}`} highlight />
             <ResultRow label="Cupón Acumulado" value={`$ ${fmt(result.cupon_acumulado)}`} />

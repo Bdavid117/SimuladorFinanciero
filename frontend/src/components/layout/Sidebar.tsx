@@ -9,7 +9,10 @@ import {
   DollarSign,
   Award,
   ChevronRight,
+  LogOut,
+  X,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const sections = [
   {
@@ -37,27 +40,47 @@ const sections = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function Sidebar({ open, onClose }: SidebarProps) {
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const initials = user?.nombre?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <aside className="w-72 bg-[#0f172a] text-white flex flex-col min-h-screen border-r border-slate-800">
-      {/* Brand */}
-      <div className="px-6 py-5 border-b border-slate-800/60">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center">
-            <Landmark size={18} className="text-white" />
+    <>
+      {/* Overlay mobile */}
+      {open && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
+      )}
+
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#0f172a] text-white flex flex-col min-h-screen border-r border-slate-800 transition-transform duration-300 ${
+          open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
+        {/* Brand */}
+        <div className="px-6 py-5 border-b border-slate-800/60 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center">
+              <Landmark size={18} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-base font-semibold tracking-tight text-white">
+                SimInversiones
+              </h1>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                Portafolio Manager
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base font-semibold tracking-tight text-white">
-              SimInversiones
-            </h1>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
-              Portafolio Manager
-            </p>
-          </div>
+          <button onClick={onClose} className="lg:hidden p-1 text-slate-500 hover:text-white transition-colors">
+            <X size={18} />
+          </button>
         </div>
-      </div>
 
       {/* Navigation */}
       <nav className="flex-1 py-4 px-3 space-y-6 overflow-y-auto scrollbar-thin">
@@ -77,6 +100,7 @@ export default function Sidebar() {
                   <NavLink
                     key={item.to}
                     to={item.to}
+                    onClick={onClose}
                     className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
                       isActive
                         ? 'bg-emerald-600/15 text-emerald-400 border-l-2 border-emerald-400 -ml-px'
@@ -100,15 +124,19 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="px-4 py-4 border-t border-slate-800/60">
         <div className="flex items-center gap-3 px-2">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
-            BD
+          <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-xs font-bold text-white">
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-slate-300 truncate">Usuario Demo</p>
-            <p className="text-[10px] text-slate-500 truncate">demo@simulador.com</p>
+            <p className="text-xs font-medium text-slate-300 truncate">{user?.nombre || 'Usuario'}</p>
+            <p className="text-[10px] text-slate-500 truncate">{user?.email || ''}</p>
           </div>
+          <button onClick={logout} className="p-1.5 text-slate-500 hover:text-red-400 transition-colors" title="Cerrar sesión">
+            <LogOut size={15} />
+          </button>
         </div>
       </div>
     </aside>
+    </>
   );
 }

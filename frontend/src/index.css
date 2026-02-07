@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  .dark body,
+  .dark {
+    color-scheme: dark;
   }
 }
 
@@ -18,5 +25,11 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 3px;
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #475569;
   }
 }

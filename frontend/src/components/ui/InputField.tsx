@@ -29,7 +29,7 @@ export default function InputField({
 }: Props) {
   return (
     <div>
-      <label className="block text-xs font-medium text-slate-600 mb-1.5">
+      <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
         {label}
         {required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
@@ -48,7 +48,7 @@ export default function InputField({
           step={step}
           min={min}
           max={max}
-          className={`w-full border border-slate-200 rounded-lg py-2 text-sm text-slate-800 placeholder:text-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all ${
+          className={`w-full border border-slate-200 dark:border-slate-600 rounded-lg py-2 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-emerald-500/20 focus:border-slate-400 dark:focus:border-emerald-500 transition-all ${
             prefix ? 'pl-8 pr-3' : suffix ? 'pl-3 pr-10' : 'px-3'
           }`}
         />

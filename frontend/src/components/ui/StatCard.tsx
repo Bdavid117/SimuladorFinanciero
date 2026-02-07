@@ -10,12 +10,12 @@ interface Props {
 
 export default function StatCard({ title, value, subtitle, icon, trend }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200/80 p-5 hover:shadow-sm transition-shadow">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 p-5 hover:shadow-sm transition-shadow">
       <div className="flex items-start justify-between">
         <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{title}</p>
-          <p className="text-2xl font-bold text-slate-900 tabular-nums">{value}</p>
-          {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">{title}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</p>
+          {subtitle && <p className="text-xs text-slate-400 dark:text-slate-500">{subtitle}</p>}
           {trend && (
             <p className={`text-xs font-medium ${trend.positive ? 'text-emerald-600' : 'text-red-600'}`}>
               {trend.positive ? '+' : ''}{trend.value}
@@ -23,7 +23,7 @@ export default function StatCard({ title, value, subtitle, icon, trend }: Props)
           )}
         </div>
         {icon && (
-          <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+          <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600 flex items-center justify-center text-slate-400 dark:text-slate-300">
             {icon}
           </div>
         )}

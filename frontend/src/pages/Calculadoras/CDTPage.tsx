@@ -83,16 +83,16 @@ export default function CDTPage() {
       </FormCard>
 
       {result && (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <h3 className="text-sm font-semibold text-slate-800">Resultado de Liquidación</h3>
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Resultado de Liquidación</h3>
             {result.es_liquidacion_anticipada && (
               <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-semibold uppercase tracking-wider rounded-md border border-amber-200">
                 Anticipada
               </span>
             )}
           </div>
-          <div className="space-y-0 divide-y divide-slate-50">
+          <div className="space-y-0 divide-y divide-slate-50 dark:divide-slate-700">
             <ResultRow label="Capital Invertido" value={`$ ${fmt(result.capital_invertido)}`} />
             <ResultRow label="Días Transcurridos" value={`${result.dias_transcurridos} / ${result.plazo_original}`} />
             <ResultRow label="Tasa Interés Anual" value={`${(result.tasa_interes_anual * 100).toFixed(2)} %`} />

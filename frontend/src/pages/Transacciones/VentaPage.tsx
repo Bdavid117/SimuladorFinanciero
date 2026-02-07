@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { venderActivo } from '../../services/lotes';
-import { DEMO_USER_ID } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import FormCard from '../../components/ui/FormCard';
 import InputField from '../../components/ui/InputField';
 import ResultRow from '../../components/ui/ResultRow';
 
 export default function VentaPage() {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     id_activo: '',
     cantidad: '',
@@ -35,7 +36,7 @@ export default function VentaPage() {
     setResult(null);
     try {
       const data = await venderActivo({
-        id_usuario: DEMO_USER_ID,
+        id_usuario: user?.id_usuario || '',
         id_activo: form.id_activo.trim(),
         cantidad: Number(form.cantidad),
         precio_venta: Number(form.precio_venta),
@@ -80,12 +81,12 @@ export default function VentaPage() {
         <InputField label="URL Evidencia" value={form.url_evidencia} onChange={set('url_evidencia')} placeholder="https://..." />
 
         <div>
-          <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Notas</label>
+          <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Notas</label>
           <textarea
             value={form.notas}
             onChange={setTextarea('notas')}
             rows={2}
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-colors resize-none"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-colors resize-none"
             placeholder="Notas adicionales..."
           />
         </div>
@@ -99,17 +100,17 @@ export default function VentaPage() {
       </FormCard>
 
       {result && (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-3">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 p-6 space-y-3">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
               <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-slate-800">Venta Registrada</h3>
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Venta Registrada</h3>
               <p className="text-xs text-slate-400">Los lotes fueron liquidados por FIFO</p>
             </div>
           </div>
-          <div className="space-y-0 divide-y divide-slate-50">
+          <div className="space-y-0 divide-y divide-slate-50 dark:divide-slate-700">
             {result.lotes_afectados !== undefined && <ResultRow label="Lotes Afectados" value={String(result.lotes_afectados)} />}
             {result.cantidad_vendida !== undefined && <ResultRow label="Cantidad Vendida" value={Number(result.cantidad_vendida).toLocaleString('es-CO')} />}
             {result.total_venta !== undefined && (

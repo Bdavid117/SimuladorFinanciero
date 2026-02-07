@@ -78,13 +78,13 @@ export default function CalificacionPage() {
       </FormCard>
 
       {result && (
-        <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 overflow-hidden">
           {/* Grade Hero */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
             <div>
               <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Calificación Obtenida</p>
               <p className="text-xs text-slate-500">
-                Nota numérica: <span className="font-mono font-semibold text-slate-700">{result.nota.toFixed(2)}</span>
+                Nota numérica: <span className="font-mono font-semibold text-slate-700 dark:text-slate-200">{result.nota.toFixed(2)}</span>
               </p>
             </div>
             <div className={`w-16 h-16 rounded-2xl ${bgColor} flex items-center justify-center shadow-lg`}>
@@ -95,19 +95,19 @@ export default function CalificacionPage() {
           {/* Details */}
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-slate-50 rounded-lg">
+              <div className="text-center p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                 <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Rendimiento</p>
-                <p className="text-sm font-mono font-semibold text-slate-800">
+                <p className="text-sm font-mono font-semibold text-slate-800 dark:text-slate-100">
                   {(result.rendimiento_real * 100).toFixed(2)}%
                 </p>
               </div>
-              <div className="text-center p-3 bg-slate-50 rounded-lg">
+              <div className="text-center p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                 <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Meta Admin</p>
-                <p className="text-sm font-mono font-semibold text-slate-800">
+                <p className="text-sm font-mono font-semibold text-slate-800 dark:text-slate-100">
                   {(result.meta_admin * 100).toFixed(2)}%
                 </p>
               </div>
-              <div className="text-center p-3 bg-slate-50 rounded-lg">
+              <div className="text-center p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                 <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">¿Superó Meta?</p>
                 <p className={`text-sm font-semibold ${result['superó_meta'] ? 'text-emerald-600' : 'text-red-500'}`}>
                   {result['superó_meta'] ? 'Sí' : 'No'}
@@ -121,7 +121,7 @@ export default function CalificacionPage() {
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider">Desempeño</span>
                 <span className="text-[10px] font-mono text-slate-500">{result.nota.toFixed(2)} / 5.00</span>
               </div>
-              <div className="w-full bg-slate-100 rounded-full h-2">
+              <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${bgColor}`}
                   style={{ width: `${Math.min((result.nota / 5) * 100, 100)}%` }}

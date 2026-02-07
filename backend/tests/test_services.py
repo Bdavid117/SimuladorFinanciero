@@ -1,129 +1,189 @@
 """
-Tests Unitarios para el Sistema de Lotes
+Tests reales de API — Autenticación, Cálculos Financieros
 """
 import pytest
-from decimal import Decimal
-from datetime import datetime, date
-from uuid import uuid4
+from datetime import date, timedelta
 
-# Estos son tests de ejemplo - necesitarás configurar pytest y fixtures apropiados
 
-class TestLoteService:
-    """Tests para el servicio de lotes"""
-    
-    def test_comprar_activo_crea_lote_verde(self):
-        """Verificar que una compra crea un lote en estado VERDE"""
-        # Arrange
-        id_usuario = uuid4()
-        id_activo = uuid4()
-        cantidad = Decimal('100')
-        precio = Decimal('25000')
-        
-        # Act
-        # resultado = LoteService.comprar_activo(...)
-        
-        # Assert
-        # assert resultado["lote"].estado == "VERDE"
-        # assert resultado["lote"].cantidad_disponible == cantidad
-        pass
-    
-    def test_vender_activo_cambia_estado_a_amarillo(self):
-        """Verificar que vender parcialmente cambia estado a AMARILLO"""
-        # Arrange - crear lote verde con 100 unidades
-        # Act - vender 50 unidades
-        # Assert - verificar estado AMARILLO y cantidad 50
-        pass
-    
-    def test_vender_activo_completo_cambia_estado_a_rojo(self):
-        """Verificar que vender todo cambia estado a ROJO"""
-        # Arrange - crear lote con 100 unidades
-        # Act - vender 100 unidades
-        # Assert - verificar estado ROJO y cantidad 0
-        pass
-    
-    def test_venta_fifo_usa_lote_mas_antiguo(self):
-        """Verificar que el sistema FIFO usa el lote más antiguo primero"""
-        # Arrange - crear 2 lotes con fechas diferentes
-        # Act - vender cantidad que solo afecte al primer lote
-        # Assert - verificar que solo el lote más antiguo fue modificado
-        pass
-    
-    def test_compra_sin_saldo_suficiente_falla(self):
-        """Verificar que no se puede comprar sin saldo"""
-        # Arrange - caja con saldo insuficiente
-        # Act & Assert - verificar que lanza ValueError
-        pass
+# ═══════════════════════════════════════════════
+# Auth endpoints
+# ═══════════════════════════════════════════════
+class TestAuth:
+    """Tests para /api/auth/*"""
 
-class TestCalculoService:
-    """Tests para el servicio de cálculos financieros"""
-    
-    def test_calculo_bono_precio_sucio(self):
-        """Verificar cálculo correcto del precio sucio de un bono"""
-        # Arrange
-        valor_nominal = Decimal('1000000')
-        tasa_cupon = Decimal('7.25')
-        frecuencia = 2
-        tir = Decimal('8.5')
-        
-        # Act
-        # resultado = CalculoFinancieroService.calcular_precio_bono_sucio(...)
-        
-        # Assert
-        # assert resultado["precio_sucio"] > 0
-        # assert resultado["precio_sucio"] < valor_nominal  # Si TIR > cupón
-        pass
-    
-    def test_liquidacion_cdt_con_penalizacion_10_porciento(self):
-        """Verificar penalización del 10% para CDT <= 60 días"""
-        # Arrange
-        capital = Decimal('10000000')
-        tasa = Decimal('12.5')
-        dias = 45  # <= 60 días
-        
-        # Act
-        # resultado = CalculoFinancieroService.calcular_liquidacion_cdt(...)
-        
-        # Assert
-        # assert resultado["penalizacion_porcentaje"] == 10.0
-        pass
-    
-    def test_liquidacion_cdt_con_penalizacion_20_porciento(self):
-        """Verificar penalización del 20% para CDT > 60 días"""
-        # Arrange
-        dias = 75  # > 60 días
-        
-        # Act & Assert
-        # assert resultado["penalizacion_porcentaje"] == 20.0
-        pass
-    
-    def test_conversion_divisa_calcula_correctamente(self):
-        """Verificar conversión de divisa extranjera"""
-        # Arrange
-        cantidad = Decimal('100')
-        precio_usd = Decimal('150.25')
-        trm = Decimal('4800')
-        
-        # Act
-        # resultado = CalculoFinancieroService.convertir_divisa(...)
-        
-        # Assert
-        # costo_esperado = cantidad * precio_usd * trm
-        # assert resultado["costo_local_sin_comision"] == costo_esperado
-        pass
-    
-    def test_calificacion_excelente(self):
-        """Verificar calificación Excelente para rendimiento superior"""
-        # Arrange
-        rendimiento = Decimal('0.20')  # 20%
-        meta = Decimal('0.15')  # 15%
-        
-        # Act
-        # resultado = CalculoFinancieroService.calcular_calificacion_final(...)
-        
-        # Assert
-        # assert resultado["nota"] >= 4.5
-        # assert resultado["calificacion"] == "Excelente"
-        pass
+    def test_register_exitoso(self, client):
+        resp = client.post("/api/auth/register", json={
+            "nombre": "Nuevo User",
+            "email": "nuevo@test.com",
+            "password": "clave123",
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "access_token" in data
+        assert data["token_type"] == "bearer"
 
-# Ejecutar tests:
-# pytest backend/tests/test_services.py -v
+    def test_register_email_duplicado(self, client):
+        payload = {"nombre": "A", "email": "dup@test.com", "password": "123456"}
+        client.post("/api/auth/register", json=payload)
+        resp = client.post("/api/auth/register", json=payload)
+        assert resp.status_code == 400
+        assert "ya registrado" in resp.json()["detail"].lower() or "registrado" in resp.json()["detail"].lower()
+
+    def test_login_exitoso(self, client):
+        client.post("/api/auth/register", json={
+            "nombre": "Login",
+            "email": "login@test.com",
+            "password": "mypass",
+        })
+        resp = client.post("/api/auth/login", json={
+            "email": "login@test.com",
+            "password": "mypass",
+        })
+        assert resp.status_code == 200
+        assert "access_token" in resp.json()
+
+    def test_login_password_incorrecto(self, client):
+        client.post("/api/auth/register", json={
+            "nombre": "Usr",
+            "email": "bad@test.com",
+            "password": "correct",
+        })
+        resp = client.post("/api/auth/login", json={
+            "email": "bad@test.com",
+            "password": "incorrect",
+        })
+        assert resp.status_code == 401
+
+    def test_me_sin_token(self, client):
+        resp = client.get("/api/auth/me")
+        # Debería ser 401 o 403 según tu implementación
+        assert resp.status_code in (401, 403)
+
+    def test_me_con_token(self, client, auth_headers):
+        resp = client.get("/api/auth/me", headers=auth_headers)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["email"] == "auth@test.com"
+
+
+# ═══════════════════════════════════════════════
+# Cálculos Financieros
+# ═══════════════════════════════════════════════
+class TestCalculosBono:
+    """Tests para /api/calculos/bono/precio-sucio"""
+
+    def test_calculo_bono_basico(self, client):
+        resp = client.post("/api/calculos/bono/precio-sucio", json={
+            "valor_nominal": 1_000_000,
+            "tasa_cupon": 0.08,
+            "frecuencia_cupon": 2,
+            "tir": 0.10,
+            "fecha_emision": "2024-01-01",
+            "fecha_vencimiento": "2029-01-01",
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["precio_sucio"] > 0
+        assert data["precio_limpio"] > 0
+        assert data["num_periodos"] > 0
+
+
+class TestCalculosCDT:
+    """Tests para /api/calculos/cdt/liquidar"""
+
+    def test_cdt_liquidacion_anticipada(self, client):
+        hoy = date.today()
+        inicio = (hoy - timedelta(days=45)).isoformat()
+        resp = client.post("/api/calculos/cdt/liquidar", json={
+            "capital_invertido": 10_000_000,
+            "tasa_interes_anual": 0.12,
+            "fecha_inicio": inicio,
+            "fecha_liquidacion": hoy.isoformat(),
+            "plazo_dias_original": 360,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["es_liquidacion_anticipada"] is True
+        assert data["penalizacion_monto"] > 0
+        assert data["monto_total_recibir"] > 0
+
+    def test_cdt_al_vencimiento(self, client):
+        hoy = date.today()
+        inicio = (hoy - timedelta(days=360)).isoformat()
+        resp = client.post("/api/calculos/cdt/liquidar", json={
+            "capital_invertido": 10_000_000,
+            "tasa_interes_anual": 0.10,
+            "fecha_inicio": inicio,
+            "fecha_liquidacion": hoy.isoformat(),
+            "plazo_dias_original": 360,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["es_liquidacion_anticipada"] is False
+        assert data["penalizacion_monto"] == 0
+
+
+class TestCalculosDivisa:
+    """Tests para /api/calculos/divisa/convertir"""
+
+    def test_conversion_basica(self, client):
+        resp = client.post("/api/calculos/divisa/convertir", json={
+            "cantidad": 100,
+            "precio_unitario": 150.25,
+            "trm": 4800,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["costo_total"] > 0
+        # costo = 100 * 150.25 * 4800 = 72,120,000
+        assert data["costo_local_sin_comision"] == pytest.approx(72_120_000, rel=0.01)
+
+    def test_conversion_con_comision(self, client):
+        resp = client.post("/api/calculos/divisa/convertir", json={
+            "cantidad": 10,
+            "precio_unitario": 100,
+            "trm": 4000,
+            "comision": 50_000,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["comision"] == pytest.approx(50_000, rel=0.01)
+        assert data["costo_total"] > data["costo_local_sin_comision"]
+
+
+class TestCalificacion:
+    """Tests para /api/calculos/calificacion"""
+
+    def test_calificacion_alta(self, client):
+        resp = client.post("/api/calculos/calificacion", json={
+            "rendimiento_real": 0.20,
+            "meta_admin": 0.08,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["nota"] > 4
+        assert "calificacion" in data
+
+    def test_calificacion_baja(self, client):
+        resp = client.post("/api/calculos/calificacion", json={
+            "rendimiento_real": 0.02,
+            "meta_admin": 0.15,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["nota"] < 3
+
+
+# ═══════════════════════════════════════════════
+# Health & Root
+# ═══════════════════════════════════════════════
+class TestHealth:
+    def test_root(self, client):
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert "mensaje" in resp.json()
+
+    def test_health(self, client):
+        resp = client.get("/health")
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "healthy"
