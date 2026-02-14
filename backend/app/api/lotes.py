@@ -7,6 +7,8 @@ from typing import List, Dict
 from uuid import UUID
 
 from app.database import get_db
+from app.auth import require_auth
+from app.models.usuario import Usuario
 from app.services.lote_service import LoteService
 from app.schemas.lote_schemas import (
     LoteCompraRequest, LoteVentaRequest,
@@ -18,7 +20,8 @@ router = APIRouter()
 @router.post("/comprar", response_model=Dict)
 async def comprar_activo(
     request: LoteCompraRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **🟢 Compra de Activo - Crea un nuevo Lote**
@@ -59,7 +62,8 @@ async def comprar_activo(
 @router.post("/vender", response_model=Dict)
 async def vender_activo(
     request: LoteVentaRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **💰 Venta de Activo - Sistema FIFO**
@@ -102,7 +106,8 @@ async def obtener_lotes_usuario(
     id_usuario: UUID,
     solo_disponibles: bool = False,
     id_activo: UUID = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **📊 Obtiene los lotes de un usuario**
@@ -140,7 +145,8 @@ async def obtener_lotes_usuario(
 @router.get("/usuario/{id_usuario}/resumen", response_model=List[Dict])
 async def obtener_resumen_por_activo(
     id_usuario: UUID,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **📈 Resumen del portafolio agrupado por activo**
@@ -161,7 +167,8 @@ async def obtener_resumen_por_activo(
 @router.get("/usuario/{id_usuario}/estadisticas", response_model=EstadisticasLotesResponse)
 async def obtener_estadisticas(
     id_usuario: UUID,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **📊 Estadísticas generales de lotes**

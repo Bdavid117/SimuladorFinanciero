@@ -2,8 +2,7 @@
 Configuración de la conexión a la base de datos PostgreSQL
 """
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from app.config import settings
 
 # Motor de base de datos
@@ -17,8 +16,9 @@ engine = create_engine(
 # Sesión de base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base para modelos
-Base = declarative_base()
+# Base para modelos (SQLAlchemy 2.x)
+class Base(DeclarativeBase):
+    pass
 
 # Dependencia para obtener la sesión de DB
 def get_db():

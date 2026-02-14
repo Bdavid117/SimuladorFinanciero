@@ -13,7 +13,7 @@ echo.
 
 echo   [1/2] Iniciando Backend (FastAPI)...
 set PYTHONPATH=%ROOT%backend
-start "Backend - FastAPI" cmd /k "cd /d %ROOT% && set PYTHONPATH=%ROOT%backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+start "Backend - FastAPI" cmd /k "cd /d %ROOT% && call venv\Scripts\activate.bat && set PYTHONPATH=%ROOT%backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
 
 timeout /t 2 /nobreak >nul
 

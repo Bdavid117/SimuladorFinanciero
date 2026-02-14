@@ -133,3 +133,105 @@ export interface CalificacionResponse {
   calificacion: string;
   'superó_meta': boolean;
 }
+
+// --- Activos Financieros ---
+export interface TipoActivo {
+  id_tipo_activo: number;
+  nombre: string;
+  descripcion?: string;
+  requiere_trm: boolean;
+  activo: boolean;
+}
+
+export interface Activo {
+  id_activo: string;
+  id_tipo_activo: number;
+  ticker: string;
+  nombre: string;
+  moneda: string;
+  mercado?: string;
+  es_extranjero: boolean;
+  activo: boolean;
+  valor_nominal?: number;
+  tasa_cupon?: number;
+  frecuencia_cupon?: number;
+  fecha_emision?: string;
+  fecha_vencimiento?: string;
+  tasa_interes_anual?: number;
+  plazo_dias?: number;
+  tipo_nombre?: string;
+}
+
+export interface ActivoCreateRequest {
+  id_tipo_activo: number;
+  ticker: string;
+  nombre: string;
+  moneda?: string;
+  mercado?: string;
+  es_extranjero?: boolean;
+  valor_nominal?: number;
+  tasa_cupon?: number;
+  frecuencia_cupon?: number;
+  fecha_emision?: string;
+  fecha_vencimiento?: string;
+  tasa_interes_anual?: number;
+  plazo_dias?: number;
+}
+
+// --- Transacciones ---
+export interface TransaccionItem {
+  id_transaccion: string;
+  id_usuario: string;
+  id_activo?: string;
+  tipo_operacion: string;
+  cantidad: number;
+  precio?: number;
+  comision: number;
+  trm: number;
+  monto_operacion: number;
+  saldo_caja_antes?: number;
+  saldo_caja_despues?: number;
+  fecha_transaccion: string;
+  id_lote?: string;
+  url_evidencia?: string;
+  notas?: string;
+  ticker_activo?: string;
+  nombre_activo?: string;
+}
+
+export interface TransaccionListResponse {
+  items: TransaccionItem[];
+  total: number;
+  pagina: number;
+  por_pagina: number;
+  total_paginas: number;
+}
+
+// --- Portafolio ---
+export interface SaldoCaja {
+  id_caja: string;
+  saldo_actual: number;
+  moneda: string;
+  fecha_actualizacion?: string;
+}
+
+export interface ResumenPortafolio {
+  saldo_caja: number;
+  inversion_total: number;
+  valor_mercado_estimado: number;
+  ganancia_perdida: number;
+  rentabilidad_porcentaje: number;
+  total_activos_diferentes: number;
+  total_lotes_activos: number;
+}
+
+export interface ValoracionDiaria {
+  id_valoracion: string;
+  fecha_valoracion: string;
+  valor_mercado_total: number;
+  costo_total_invertido: number;
+  ganancia_perdida?: number;
+  rentabilidad_porcentaje?: number;
+  efectivo_disponible?: number;
+  fecha_calculo?: string;
+}

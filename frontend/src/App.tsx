@@ -16,6 +16,9 @@ const BonosPage = lazy(() => import('./pages/Calculadoras/BonosPage'));
 const CDTPage = lazy(() => import('./pages/Calculadoras/CDTPage'));
 const DivisasPage = lazy(() => import('./pages/Calculadoras/DivisasPage'));
 const CalificacionPage = lazy(() => import('./pages/Calificacion/CalificacionPage'));
+const ActivosPage = lazy(() => import('./pages/Activos/ActivosPage'));
+const TransaccionesPage = lazy(() => import('./pages/Transacciones/TransaccionesPage'));
+const PortafolioPage = lazy(() => import('./pages/Portafolio/PortafolioPage'));
 
 function PageLoader() {
   return (
@@ -52,6 +55,9 @@ function App() {
                   <Route path="/calculadora/cdt" element={<CDTPage />} />
                   <Route path="/calculadora/divisas" element={<DivisasPage />} />
                   <Route path="/calificacion" element={<CalificacionPage />} />
+                  <Route path="/activos" element={<ActivosPage />} />
+                  <Route path="/transacciones" element={<TransaccionesPage />} />
+                  <Route path="/portafolio" element={<PortafolioPage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

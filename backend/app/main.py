@@ -1,12 +1,19 @@
 """
 Aplicación Principal FastAPI - Simulador de Inversiones
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from app.config import settings
 
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
 # Importar routers
-from app.api import lotes, calculos, auth
+from app.api import lotes, calculos, auth, activos, transacciones, portafolio
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -38,6 +45,10 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Registrar rate limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configurar CORS
 # Parse ALLOWED_ORIGINS from comma-separated string or list
@@ -76,3 +87,6 @@ async def health_check():
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticación"])
 app.include_router(lotes.router, prefix="/api/lotes", tags=["Lotes - Sistema de Inventario"])
 app.include_router(calculos.router, prefix="/api/calculos", tags=["Cálculos Financieros"])
+app.include_router(activos.router, prefix="/api/activos", tags=["Activos Financieros"])
+app.include_router(transacciones.router, prefix="/api/transacciones", tags=["Historial de Transacciones"])
+app.include_router(portafolio.router, prefix="/api/portafolio", tags=["Portafolio e Inversiones"])

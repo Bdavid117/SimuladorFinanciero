@@ -83,8 +83,8 @@ export default function LotesPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-xs text-red-700">{error}</p>
+        <div className="bg-red-500/10 border border-red-500/20 dark:border-red-500/20 rounded-lg p-4">
+          <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -120,25 +120,25 @@ export default function LotesPage() {
                         <SemaforoBadge estado={lote.estado as EstadoLote} size="sm" />
                       </td>
                       <td className="px-5 py-3">
-                        <code className="text-[11px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded">
+                        <code className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-1.5 py-0.5 rounded">
                           {lote.id_lote.slice(0, 8)}
                         </code>
                       </td>
-                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-600">
+                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-600 dark:text-slate-400">
                         {Number(lote.cantidad_inicial).toLocaleString('es-CO')}
                       </td>
-                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-800 font-medium">
+                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-800 dark:text-slate-100 font-medium">
                         {Number(lote.cantidad_disponible).toLocaleString('es-CO')}
                       </td>
-                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-600">
+                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-600 dark:text-slate-400">
                         {formatCOP(Number(lote.precio_compra))}
                       </td>
-                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-800 font-medium">
+                      <td className="px-5 py-3 text-right font-mono text-xs text-slate-800 dark:text-slate-100 font-medium">
                         {formatCOP(Number(lote.costo_total))}
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-center gap-2">
-                          <div className="w-14 bg-slate-100 rounded-full h-1.5">
+                          <div className="w-14 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                             <div
                               className={`h-1.5 rounded-full transition-all ${
                                 lote.porcentaje_disponible === 100 ? 'bg-emerald-500'
@@ -153,7 +153,7 @@ export default function LotesPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-xs text-slate-500">
+                      <td className="px-5 py-3 text-xs text-slate-500 dark:text-slate-400">
                         {formatDate(lote.fecha_compra)}
                       </td>
                     </tr>

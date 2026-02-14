@@ -1,7 +1,9 @@
 """
 API Endpoints de Autenticación
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -11,22 +13,27 @@ from app.auth import (
     verify_password,
     get_password_hash,
     create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
     require_auth,
 )
 from app.schemas.auth_schemas import (
     RegisterRequest,
     LoginRequest,
     TokenResponse,
+    RefreshRequest,
     UserResponse,
 )
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=201)
-async def register(request: RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def register(request: Request, body: RegisterRequest, db: Session = Depends(get_db)):
     """Registra un nuevo usuario y retorna un token JWT."""
-    existing = db.query(Usuario).filter(Usuario.email == request.email).first()
+    existing = db.query(Usuario).filter(Usuario.email == body.email).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -34,9 +41,9 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
         )
 
     usuario = Usuario(
-        nombre=request.nombre,
-        email=request.email,
-        password_hash=get_password_hash(request.password),
+        nombre=body.nombre,
+        email=body.email,
+        password_hash=get_password_hash(body.password),
     )
     db.add(usuario)
     db.flush()
@@ -51,9 +58,11 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(usuario)
 
-    token = create_access_token(data={"sub": str(usuario.id_usuario)})
+    access = create_access_token(data={"sub": str(usuario.id_usuario)})
+    refresh = create_refresh_token(data={"sub": str(usuario.id_usuario)})
     return TokenResponse(
-        access_token=token,
+        access_token=access,
+        refresh_token=refresh,
         user_id=str(usuario.id_usuario),
         nombre=usuario.nombre,
         email=usuario.email,
@@ -61,18 +70,49 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(request: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)):
     """Inicia sesión y retorna un token JWT."""
-    usuario = db.query(Usuario).filter(Usuario.email == request.email).first()
-    if not usuario or not verify_password(request.password, usuario.password_hash):
+    usuario = db.query(Usuario).filter(Usuario.email == body.email).first()
+    if not usuario or not verify_password(body.password, usuario.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Correo o contraseña incorrectos",
         )
 
-    token = create_access_token(data={"sub": str(usuario.id_usuario)})
+    access = create_access_token(data={"sub": str(usuario.id_usuario)})
+    refresh = create_refresh_token(data={"sub": str(usuario.id_usuario)})
     return TokenResponse(
-        access_token=token,
+        access_token=access,
+        refresh_token=refresh,
+        user_id=str(usuario.id_usuario),
+        nombre=usuario.nombre,
+        email=usuario.email,
+    )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("10/minute")
+async def refresh_token(request: Request, body: RefreshRequest, db: Session = Depends(get_db)):
+    """Renueva el access token usando un refresh token válido."""
+    user_id = decode_refresh_token(body.refresh_token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token inválido o expirado",
+        )
+    from uuid import UUID
+    usuario = db.query(Usuario).filter(Usuario.id_usuario == UUID(user_id)).first()
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuario no encontrado",
+        )
+    new_access = create_access_token(data={"sub": str(usuario.id_usuario)})
+    new_refresh = create_refresh_token(data={"sub": str(usuario.id_usuario)})
+    return TokenResponse(
+        access_token=new_access,
+        refresh_token=new_refresh,
         user_id=str(usuario.id_usuario),
         nombre=usuario.nombre,
         email=usuario.email,

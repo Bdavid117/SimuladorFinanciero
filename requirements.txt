@@ -17,10 +17,10 @@ alembic
 python-dateutil
 pydantic
 pydantic-settings
-passlib[bcrypt]
 python-jose[cryptography]
 bcrypt
 python-dotenv
+slowapi
 
 # Cálculos financieros y matemáticos
 numpy

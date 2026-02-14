@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from typing import Dict
 
 from app.database import get_db
+from app.auth import require_auth
+from app.models.usuario import Usuario
 from app.services.calculo_service import CalculoFinancieroService
 from app.schemas.calculo_schemas import (
     CalculoBonoRequest, CalculoBonoResponse,
@@ -20,7 +22,8 @@ router = APIRouter()
 @router.post("/bono/precio-sucio", response_model=CalculoBonoResponse)
 async def calcular_precio_bono(
     request: CalculoBonoRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **Calcula el Precio Sucio de un Bono**
@@ -56,7 +59,8 @@ async def calcular_precio_bono(
 @router.post("/bono/desde-activo", response_model=Dict)
 async def calcular_bono_desde_activo(
     request: CalculoBonoActivoRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **Calcula valoración de un bono registrado en la base de datos**
@@ -78,7 +82,8 @@ async def calcular_bono_desde_activo(
 @router.post("/cdt/liquidar", response_model=CalculoCDTResponse)
 async def calcular_liquidacion_cdt(
     request: CalculoCDTRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **Calcula la liquidación de un CDT con penalizaciones**
@@ -112,7 +117,10 @@ async def calcular_liquidacion_cdt(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/divisa/convertir", response_model=ConversionDivisaResponse)
-async def convertir_divisa(request: ConversionDivisaRequest):
+async def convertir_divisa(
+    request: ConversionDivisaRequest,
+    _current_user: Usuario = Depends(require_auth),
+):
     """
     **Convierte el costo de activos extranjeros a moneda local**
     
@@ -140,7 +148,8 @@ async def convertir_divisa(request: ConversionDivisaRequest):
 @router.post("/calificacion", response_model=CalificacionResponse)
 async def calcular_calificacion(
     request: CalificacionRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: Usuario = Depends(require_auth),
 ):
     """
     **Calcula la calificación final del portafolio**

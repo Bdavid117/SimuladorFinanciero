@@ -29,6 +29,7 @@ export default function MainLayout() {
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden p-2 mr-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+            aria-label="Toggle sidebar"
           >
             <Menu size={20} />
           </button>

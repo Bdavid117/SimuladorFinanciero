@@ -27,15 +27,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedToken = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     if (savedToken && savedUser) {
+      // Restaurar estado local inmediatamente
       try {
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
       } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setLoading(false);
+        return;
       }
+      // Validar que el token siga siendo válido contra el backend
+      api
+        .get('/api/auth/me', {
+          headers: { Authorization: `Bearer ${savedToken}` },
+        })
+        .then((res) => {
+          const d = res.data;
+          const u: User = { id_usuario: d.id_usuario, nombre: d.nombre, email: d.email };
+          setUser(u);
+          localStorage.setItem('user', JSON.stringify(u));
+        })
+        .catch(() => {
+          // Token inválido o expirado → cerrar sesión
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setToken(null);
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   async function login(email: string, password: string) {
@@ -43,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = res.data;
     const u: User = { id_usuario: data.user_id, nombre: data.nombre, email: data.email };
     localStorage.setItem('token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
     localStorage.setItem('user', JSON.stringify(u));
     setToken(data.access_token);
     setUser(u);
@@ -53,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = res.data;
     const u: User = { id_usuario: data.user_id, nombre: data.nombre, email: data.email };
     localStorage.setItem('token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
     localStorage.setItem('user', JSON.stringify(u));
     setToken(data.access_token);
     setUser(u);
@@ -60,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
